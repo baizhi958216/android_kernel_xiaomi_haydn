@@ -268,7 +268,7 @@ void fortify_panic(const char *name) __noreturn __cold;
 void __read_overflow(void) __compiletime_error("detected read beyond size of object passed as 1st parameter");
 void __read_overflow2(void) __compiletime_error("detected read beyond size of object passed as 2nd parameter");
 void __read_overflow3(void) __compiletime_error("detected read beyond size of object passed as 3rd parameter");
-void __write_overflow(void) __compiletime_error("detected write beyond size of object passed as 1st parameter");
+// void __write_overflow(void) __compiletime_error("detected write beyond size of object passed as 1st parameter");
 
 #if !defined(__NO_FORTIFY) && defined(__OPTIMIZE__) && defined(CONFIG_FORTIFY_SOURCE)
 
@@ -300,7 +300,7 @@ __FORTIFY_INLINE char *strncpy(char *p, const char *q, __kernel_size_t size)
 {
 	size_t p_size = __builtin_object_size(p, 0);
 	if (__builtin_constant_p(size) && p_size < size)
-		__write_overflow();
+		__compiletime_error("detected write beyond size of object passed as 1st parameter");
 	if (p_size < size)
 		fortify_panic(__func__);
 	return __underlying_strncpy(p, q, size);
@@ -354,7 +354,7 @@ __FORTIFY_INLINE size_t strlcpy(char *p, const char *q, size_t size)
 	if (size) {
 		size_t len = (ret >= size) ? size - 1 : ret;
 		if (__builtin_constant_p(len) && len >= p_size)
-			__write_overflow();
+			__compiletime_error("detected write beyond size of object passed as 1st parameter");
 		if (len >= p_size)
 			fortify_panic(__func__);
 		__underlying_memcpy(p, q, len);
@@ -384,7 +384,7 @@ __FORTIFY_INLINE void *memset(void *p, int c, __kernel_size_t size)
 {
 	size_t p_size = __builtin_object_size(p, 0);
 	if (__builtin_constant_p(size) && p_size < size)
-		__write_overflow();
+		__compiletime_error("detected write beyond size of object passed as 1st parameter");
 	if (p_size < size)
 		fortify_panic(__func__);
 	return __underlying_memset(p, c, size);
@@ -396,7 +396,7 @@ __FORTIFY_INLINE void *memcpy(void *p, const void *q, __kernel_size_t size)
 	size_t q_size = __builtin_object_size(q, 0);
 	if (__builtin_constant_p(size)) {
 		if (p_size < size)
-			__write_overflow();
+			__compiletime_error("detected write beyond size of object passed as 1st parameter");
 		if (q_size < size)
 			__read_overflow2();
 	}
@@ -411,7 +411,7 @@ __FORTIFY_INLINE void *memmove(void *p, const void *q, __kernel_size_t size)
 	size_t q_size = __builtin_object_size(q, 0);
 	if (__builtin_constant_p(size)) {
 		if (p_size < size)
-			__write_overflow();
+			__compiletime_error("detected write beyond size of object passed as 1st parameter");
 		if (q_size < size)
 			__read_overflow2();
 	}
